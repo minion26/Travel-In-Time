@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,7 @@ public class CardsRecViewAdapter extends RecyclerView.Adapter<CardsRecViewAdapte
 
     public CardsRecViewAdapter(Context context){
         this.context = context;
+//        this.wikiContents = wikiDataList;
     }
 
 
@@ -37,18 +40,41 @@ public class CardsRecViewAdapter extends RecyclerView.Adapter<CardsRecViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull CardsRecViewAdapter.ViewHolder holder, int position) {
-        holder.title.setText(wikiContents.get(position).getTitle());
-        holder.description.setText(wikiContents.get(position).getDescription());
+
+        WikiDataModel.Page page = wikiContents.get(position).getPages().get(0);
+
+        //holidays does not have a year
+        if(wikiContents.get(position).getYear() != null){
+            holder.year.setText(wikiContents.get(position).getYear());
+        }else{
+            holder.year.setVisibility(View.GONE);
+        }
+
+        holder.title.setText(wikiContents.get(position).getText());
+        holder.description.setText(wikiContents.get(position).getPages().get(0).getExtract());
 
         // custom width and height for the image from wiki
-        ViewGroup.LayoutParams layoutParams = holder.image.getLayoutParams();
-        layoutParams.width = wikiContents.get(position).getImageWidth();
-        layoutParams.height = wikiContents.get(position).getImageHeight();
+        if(page.getThumbnail() != null){
+            ViewGroup.LayoutParams layoutParams = holder.image.getLayoutParams();
+            layoutParams.width = wikiContents.get(position).getPages().get(0).getThumbnail().getWidth();
+            layoutParams.height = wikiContents.get(position).getPages().get(0).getThumbnail().getHeight();
 
-        Glide.with(holder.itemView.getContext())
-                .asBitmap()
-                .load(wikiContents.get(position).getImageUrl())
-                .into(holder.image);
+            Glide.with(holder.itemView.getContext())
+                    .asBitmap()
+                    .load(wikiContents.get(position).getPages().get(0).getThumbnail().getSource())
+                    .into(holder.image);
+        }else{
+            holder.image.setImageResource(R.drawable.ic_launcher_background); // Set a placeholder image
+        }
+
+        holder.itemView.setOnClickListener(v -> {
+            if(holder.description.getVisibility() == View.GONE){
+                holder.description.setVisibility(View.VISIBLE);
+            }else{
+                holder.description.setVisibility(View.GONE);
+            }
+        });
+
     }
 
     @Override
@@ -57,13 +83,14 @@ public class CardsRecViewAdapter extends RecyclerView.Adapter<CardsRecViewAdapte
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    public void setContacts(List<WikiDataModel> contacts) {
+    public void setWikiContents(List<WikiDataModel> contacts) {
         this.wikiContents = contacts;
         notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
+        private TextView year;
         private TextView title;
 
         private TextView description;
@@ -75,6 +102,7 @@ public class CardsRecViewAdapter extends RecyclerView.Adapter<CardsRecViewAdapte
         public ViewHolder(@NonNull View itemView) {
             // not inside an activity
             super(itemView);
+            year = itemView.findViewById(R.id.year);
             title = itemView.findViewById(R.id.title);
             description = itemView.findViewById(R.id.description);
             image = itemView.findViewById(R.id.image);

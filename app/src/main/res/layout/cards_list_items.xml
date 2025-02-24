@@ -14,32 +14,40 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="year" />
+
+        <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
+            android:layout_below="@+id/year"
+            android:fontFamily="@font/comicneuebold"
             android:text="title"
-            android:textStyle="bold"
-            android:layout_marginTop="10dp"
-            android:fontFamily="@font/comicneuebold"/>
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/description"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/title"
-            android:layout_marginStart="10dp"
+            android:layout_alignParentStart="true"
+            android:layout_marginStart="39dp"
+            android:layout_marginTop="22dp"
             android:text="description"
-            android:textStyle="italic" />
+            android:textStyle="italic"
+            android:visibility="gone" />
 
         <ImageView
             android:id="@+id/image"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:layout_alignStart="@+id/description"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="191dp"
-            android:layout_marginTop="41dp"
+            android:layout_below="@+id/description"
+            android:layout_centerHorizontal="true"
             android:contentDescription="image"
             android:src="@drawable/ic_launcher_background" />
     </RelativeLayout>

@@ -8,6 +8,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +26,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class MainActivity extends AppCompatActivity {
 
     private static final String WIKIPEDIA_URL = "https://api.wikimedia.org/";
-    private static final String AUTH_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJhdWQiOiI1ZjhiMmMyYzE1ZjAwYzE2ZDRhZmNiNzBlZDMxZmQxOSIsImp0aSI6ImVmZDIzYTM0MTZiMjEwN2VkNzE5ZjY1NTIyNWVlZGZjZGE2M2YxOWFhMmE5ZmJhMGI4MGJjYzJmYzEzZDE3Y2FkODhjMDY3NzBkZjU1ZDhjIiwiaWF0IjoxNzM5NTM4NTcwLjM2Njg0NCwibmJmIjoxNzM5NTM4NTcwLjM2Njg0NywiZXhwIjozMzI5NjQ0NzM3MC4zNjU1MTcsInN1YiI6Ijc3NjQwMjczIiwiaXNzIjoiaHR0cHM6Ly9tZXRhLndpa2ltZWRpYS5vcmciLCJyYXRlbGltaXQiOnsicmVxdWVzdHNfcGVyX3VuaXQiOjUwMDAsInVuaXQiOiJIT1VSIn0sInNjb3BlcyI6WyJiYXNpYyJdfQ.Pms36aRiT0Pq_nZ1r16owU7pY32WAcRY7m62hiRXDfOo7C1b3bWi_DamK5iUNb8LSXJFLicKTPtXVRGGnjYeNjI54tAh5Nxza5pYYX8YaSAhbk6Yj2SudHt9Zw6jAnyHe63OvdfeSlncflM8GUhXllK-ka5hs3WdQIeKaVsI-DFFZkjw6ptYJwpFzHICvOff1QiZx3i0d0fmTlUGMovpbVHAZ4IzdS6CDaBilRv8BSy2csDKniN4NMGciOnyXWBA0HSFefVEQMhSRjdzwdPI1zerKuLOHfcJ0_aLti_nytuusag2hMRpa8c7plQnfvsa2y3QZqctOzf1n7z3WD1pZ8InBoudM70VEAMfvmzs5OKCWjKDNMG5NymTJpQV7BrY_OkjyFZpZkZGXym_8xKAw5Ccqiw6Yv_RZWOiA2fztp_RcO5lozS1iA6_5digkmVIGfqmgAFPs2tQeWiRGF-xhHQVDRDtavrwn-E9h0HBI4lQve3cCXit-q677qkl8xhNAudtorC5gIksImjmBGkNdLdBU1RdOHN3Oe2wM6_QqYKmVMfwPAt8sC4_8M2dxTKJ0oOpqY1gY0NiRsfk2Rf4MLFahxtuL4sIVDtIPhxNHV0udkjaZKs9MMlZYrdNZh2nP_3EElqSqdY2eqa9xyqwyCOg2acvmehSg7SDu4zD2IQ";
+    private static final String AUTH_TOKEN = "";
+
+    private RecyclerView recyclerView;
+    private List<WikiDataModel> wikiDataList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +45,14 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        recyclerView = findViewById(R.id.recyclerView);
+        CardsRecViewAdapter adapter = new CardsRecViewAdapter(this);
+        adapter.setWikiContents(wikiDataList);
+
+        // Set a layout manager for the RecyclerView
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(adapter);
 
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -64,21 +78,27 @@ public class MainActivity extends AppCompatActivity {
 
         WikiApiService wikiApiService = retrofit.create(WikiApiService.class);
 
-        //TODO : modify the data model to reflect the JSON response
-        //TODO : change the adapter to reflect the new data model
-        //TODO : change the layout of the card
+        //TODO : add buttons for holiday, births, deaths, events
+        //TODO : make the main activity more ux
         //TODO : make the logic for the api calls
 
 
-        Call<OnThisDayResponse> call = wikiApiService.getEvents("02", "14");
-        call.enqueue(new Callback<OnThisDayResponse>() {
+        Call<OnThisDayResponse> events = wikiApiService.getEvents("02", "14");
+        events.enqueue(new Callback<OnThisDayResponse>() {
             @Override
             public void onResponse(Call<OnThisDayResponse> call, Response<OnThisDayResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     Log.d("Wiki Access", "Successfully accessed Wikipedia");
+                    wikiDataList.clear();
+                    if (response.body().getEvents() != null) {
+                        wikiDataList.addAll(response.body().getEvents());
+                    }
+                    adapter.notifyDataSetChanged();
+
                     // Procesează răspunsul aici
-//                    Log.d("Wiki Access", "Events: " + response.body().getEvents().size());
-                    Log.d("Wiki Access", "Events: " + response.body().getEvents().get(0).getTitle());
+                    // Log.d("Wiki Access", "Events: " + response.body().getEvents());
+                    // Log.d("Wiki Access", "Events: " + response.body().getEvents().get(0).getText());
+
                 } else {
                     Log.e("Wiki Access Error", "Response not successful: " + response.code());
                 }
