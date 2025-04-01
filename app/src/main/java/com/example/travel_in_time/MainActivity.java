@@ -9,6 +9,8 @@ import android.widget.Button;
 
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -173,8 +175,35 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
 
+        //pop up message if you want to exit the app and the flower is still growing
+        OnBackPressedCallback callback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (recyclerView.getVisibility() == View.VISIBLE) {
+                    recyclerView.setVisibility(View.GONE);
+                    eventsButton.setVisibility(View.VISIBLE);
+                    holidaysButton.setVisibility(View.VISIBLE);
+                    deathsButton.setVisibility(View.VISIBLE);
+                    birthsButton.setVisibility(View.VISIBLE);
+                }else{
+                    // Show the exit confirmation dialog
+                    new AlertDialog.Builder(MainActivity.this)
+                            .setTitle("Exit")
+                            .setMessage("Are you sure you want to exit?")
+                            .setPositiveButton("Yes", (dialog, which) -> {
+                                // Handle the exit action
+                                finish();
+                            })
+                            .setNegativeButton("No", null)
+                            .show();
+                }
 
-        //TODO : make the main activity more ux
+            }
+        };
+
+        // Add the callback to the back button
+        getOnBackPressedDispatcher().addCallback(this, callback);
+
 
     }
 

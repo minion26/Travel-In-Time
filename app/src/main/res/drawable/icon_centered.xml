@@ -1,0 +1,10 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:gravity="center">
+        <bitmap
+            android:src="@drawable/icon_resized_2"
+            android:gravity="center"
+            android:width="70px"
+            android:height="70px"
+            android:scaleType="centerInside"/>
+    </item>
+</layer-list>
